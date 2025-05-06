@@ -2,12 +2,53 @@ _format_version: "3.0"
 _transform: true
 
 services:
-  - host: httpbin.konghq.com
-    name: example_service
-    port: 80
-    protocol: http
+  - url: https://9v78461s-8089.asse.devtunnels.ms/
+    name: user_service
     routes:
-      - name: example_route
+      - name: current_user_route
         paths:
-          - /mock
+          - /user/me
         strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+              key_claim_name: iss
+      - name: user_public_route
+        paths:
+          - /user
+        strip_path: true
+  - url: https://9v78461s-8089.asse.devtunnels.ms/me
+    name: user_me_service
+    routes:
+      - name: user_me_route
+        paths:
+          - /user/me
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+              key_claim_name: iss
+
+  - url: https://kbdncz6b-8080.asse.devtunnels.ms/
+    name: permission_service
+    routes:
+      - name: permission_route
+        paths:
+          - /permission
+        strip_path: true
+    plugins:
+      - name: jwt
+        config:
+          claims_to_verify:
+            - exp
+          key_claim_name: iss
+
+consumers:
+  - username: bff
+    jwt_secrets:
+      - secret: "a-string-secret-at-least-256-bits-long"
+        key: "iss-key"
