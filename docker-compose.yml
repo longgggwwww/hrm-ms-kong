@@ -1,7 +1,7 @@
 services:
   kong:
     image: kong/kong-gateway:3.10.0.1
-    container_name: hrm-kong
+    container_name: hrm_kong
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
@@ -25,4 +25,5 @@ services:
 
 networks:
   shared_network:
-    name: hrm-shared-network
+    name: hrm_shared_network
+    external: true
