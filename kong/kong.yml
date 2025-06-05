@@ -2,7 +2,7 @@ _format_version: "3.0"
 _transform: true
 
 services:
-  - url: http://user_app:8080/me
+  - url: http://192.168.1.7:8089/me
     name: user_me_service
     routes:
       - name: user_me_route
@@ -18,8 +18,14 @@ services:
           - name: cors
             config:
               origins: ["*"]
+          - name: key-auth
+            config:
+              key_names: ["apikey"]
+              key_in_header: true
+              key_in_query: false
+              hide_credentials: false
 
-  - url: http://user_app:8080
+  - url: http://192.168.1.7:8089
     name: user_service
     routes:
       - name: user_public_route
@@ -30,8 +36,14 @@ services:
           - name: cors
             config:
               origins: ["*"]
+          - name: key-auth
+            config:
+              key_names: ["apikey"]
+              key_in_header: true
+              key_in_query: false
+              hide_credentials: false
 
-  - url: http://perm_app:8080
+  - url: http://192.168.1.24:8080
     name: permission_service
     routes:
       - name: permission_route
@@ -47,9 +59,64 @@ services:
           - name: cors
             config:
               origins: ["*"]
+          - name: key-auth
+            config:
+              key_names: ["apikey"]
+              key_in_header: true
+              key_in_query: false
+              hide_credentials: false
+
+  - url: http://192.168.1.24:8081
+    name: hr_service
+    routes:
+      - name: hr_route
+        paths:
+          - /hr
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: cors
+            config:
+              origins: ["*"]
+          - name: key-auth
+            config:
+              key_names: ["apikey"]
+              key_in_header: true
+              key_in_query: false
+              hide_credentials: false
+
+  - host: httpbin.konghq.com
+    name: example_service
+    port: 80
+    protocol: http
+    routes:
+      - name: example_route
+        paths:
+          - /mock
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+              key_claim_name: iss
+          - name: cors
+            config:
+              origins: ["*"]
+          - name: key-auth
+            config:
+              key_names: ["apikey"]
+              key_in_header: true
+              key_in_query: false
+              hide_credentials: false
 
 consumers:
   - username: bff
     jwt_secrets:
       - secret: "a-string-secret-at-least-256-bits-long"
         key: "iss-key"
+    keyauth_credentials:
+      - key: "bff-api-key"
